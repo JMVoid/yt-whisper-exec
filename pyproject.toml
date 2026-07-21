@@ -8,7 +8,8 @@ dependencies = [
     "yt-dlp",
     "deepgram-sdk>=0.4.0",
     "python-dotenv",
-    "asyncio"
+    "asyncio",
+    "pyinstaller"
 ]
 
 [build-system]

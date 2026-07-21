@@ -2,6 +2,7 @@
 
 import os
 import sys
+from PyInstaller.utils.hooks import collect_submodules
 
 # Get project root directory
 project_root = os.path.abspath(".")
@@ -18,22 +19,22 @@ a = Analysis(
     ],
     hiddenimports=[
         # Core dependencies
-        'pytubefix',
-        'deepgram-sdk',
+        *collect_submodules('yt_dlp'),
+        'deepgram',
         'dotenv',
-        
+
         # Async related
         'asyncio',
         'logging',
         'tempfile',
         'enum',
         'typing',
-        
+
         # Network requests
         'requests',
         'urllib3',
         'certifi',
-        
+
         # File processing
         'zipfile',
         'tarfile',
