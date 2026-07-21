@@ -4,7 +4,7 @@ A command-line tool for transcribing audio from YouTube videos into text using W
 
 ## Features
 
-- **Audio Download**: Downloads audio from YouTube videos using pytubefix
+- **Audio Download**: Downloads audio from YouTube videos using yt-dlp
 - **Audio Transcription**: Transcribes audio to text using Deepgram API
 - **Extensive Language Support**: Supports 35+ languages for transcription with auto-detection
 - **Smart Audio Processing**: Splits long audio files for optimal transcription quality
