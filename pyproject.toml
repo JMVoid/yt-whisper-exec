@@ -1,0 +1,19 @@
+[project]
+name = "yt-whisper-exec"
+version = "0.2.0"
+description = "YouTube video transcription CLI tool using Whisper"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pytubefix",
+    "deepgram-sdk>=0.4.0",
+    "python-dotenv",
+    "asyncio"
+]
+
+[build-system]
+requires = ["pyinstaller", "setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+yt-whisper-exec = "cli:main"
