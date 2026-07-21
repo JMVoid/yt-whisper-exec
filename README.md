@@ -12,25 +12,34 @@ A command-line tool for transcribing audio from YouTube videos into text using W
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11+
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
 - ffmpeg (for audio processing)
 - Deepgram API key (for transcription)
 
 ## Installation
 
-### Build from Source
+### 1. Install Dependencies
 
-To build the executable, run:
+First, install project dependencies using `uv`:
 
 ```bash
-pyinstaller yt-whisper.spec --clean
+uv sync
+```
+
+### 2. Build Executable
+
+To build the standalone binary, run:
+
+```bash
+uv run pyinstaller yt-whisper.spec --clean
 ```
 
 After compilation, the executable will be located at:
-- **Linux/macOS**: `dist/yt-whisper/yt-whisper`
-- **Windows**: `dist/yt-whisper/yt-whisper.exe`
+- **Linux/macOS**: `dist/yt-whisper`
+- **Windows**: `dist/yt-whisper.exe`
 
-> **Note**: The `--clean` flag removes temporary build files before compilation for a clean build.
+> **Note**: The `--clean` flag removes temporary build files before compilation for a clean build. PyInstaller uses the `uv`-managed virtual environment to resolve dependencies.
 
 ## Usage
 

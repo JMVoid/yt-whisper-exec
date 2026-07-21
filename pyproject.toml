@@ -17,3 +17,9 @@ build-backend = "setuptools.build_meta"
 
 [project.scripts]
 yt-whisper-exec = "cli:main"
+
+[tool.setuptools]
+py-modules = ["cli"]
+
+[tool.setuptools.packages.find]
+include = ["youtube*", "whisper*", "utils*"]
