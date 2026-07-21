@@ -6,9 +6,6 @@ import logging
 import tempfile
 from typing import Optional, Dict, Any
 
-import pytubefix
-from pytubefix import YouTube
-
 from youtube.yt_audio_dl import dl_audio
 from whisper.whisper_deepgram import transcribe_with_deepgram
 from utils.constant import MAX_WORKERS_NUMBER
@@ -139,36 +136,31 @@ async def audio_transcribe_with_id(url: str, language: Optional[str] = None) -> 
             await ctx.report_progress(5, 100, "Initializing...")
             
             logging.info(f"Created temporary directory for audio processing: {temp_dir}")
-            # 配置代理
-            proxy_dict = None
-            if yt_dl_proxy:
-                if yt_dl_proxy.startswith('http://') or yt_dl_proxy.startswith('https://'):
-                    proxy_dict = {'http': yt_dl_proxy, 'https': yt_dl_proxy}
-                else:
-                    proxy_dict = {'http': f'http://{yt_dl_proxy}', 'https': f'http://{yt_dl_proxy}'}
-            
-            yt = YouTube(url, proxies=proxy_dict)
             
             # 下载音频阶段
             await ctx.info("Downloading audio from YouTube...")
             await ctx.report_progress(10, 100, "Downloading audio")
             
             logging.info(f"Downloading audio from {url} to {temp_dir}")
-            success, audio_file_path_or_error = dl_audio(yt, temp_dir)
+            success, result_or_error = dl_audio(url, temp_dir, yt_dl_proxy)
 
             if not success:
-                error_msg = f"Failed to download audio: {audio_file_path_or_error}"
+                error_msg = f"Failed to download audio: {result_or_error}"
                 logging.error(error_msg)
                 await ctx.error(error_msg)
                 stop_heartbeat.set()
                 await heartbeat_task_handle
                 return {"status": "failure", "reason": error_msg}
 
+            audio_file_path = result_or_error["path"]
+            video_title = result_or_error["title"]
+            video_description = result_or_error["description"]
+
             # 转录阶段
             await ctx.info("Audio downloaded successfully. Starting transcription...")
             await ctx.report_progress(30, 100, "Processing audio file")
             
-            logging.info(f"Starting transcription for {audio_file_path_or_error}")
+            logging.info(f"Starting transcription for {audio_file_path}")
             
             # 创建进度回调
             def create_progress_callback():
@@ -196,7 +188,7 @@ async def audio_transcribe_with_id(url: str, language: Optional[str] = None) -> 
             transcript = await loop.run_in_executor(
                 None,
                 transcribe_fn,
-                audio_file_path_or_error,      # audio_path
+                audio_file_path,               # audio_path
                 whisper_api_key,                # api_key
                 language,                       # language
                 480,                            # split_duration
@@ -229,8 +221,8 @@ async def audio_transcribe_with_id(url: str, language: Optional[str] = None) -> 
             
             return {
                 "status": "success",
-                "title": yt.title,
-                "description": yt.description,
+                "title": video_title,
+                "description": video_description,
                 "transcript": transcript
             }
 
