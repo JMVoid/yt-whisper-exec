@@ -20,10 +20,12 @@ def dl_audio(url: str, store_path: str, proxy: Optional[str] = None, cookies: Op
     """
     try:
         ydl_opts = {
-            'format': 'bestaudio/best',
+            'format': 'worstaudio',
             'outtmpl': f'{store_path}/%(id)s_audio.%(ext)s',
             'quiet': True,
             'no_warnings': True,
+            'js_runtimes': {'node': {}},
+            'remote_components': ['ejs:github'],
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'm4a',
