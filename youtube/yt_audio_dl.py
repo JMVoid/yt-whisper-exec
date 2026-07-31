@@ -3,7 +3,7 @@ from typing import Optional
 import yt_dlp
 
 
-def dl_audio(url: str, store_path: str, proxy: Optional[str] = None):
+def dl_audio(url: str, store_path: str, proxy: Optional[str] = None, cookies: Optional[str] = None):
     """
     使用 yt-dlp 下载 YouTube 视频的音频。
 
@@ -11,6 +11,7 @@ def dl_audio(url: str, store_path: str, proxy: Optional[str] = None):
         url (str): YouTube 视频 URL。
         store_path (str): 音频文件的保存目录。
         proxy (Optional[str]): 代理地址，如 "http://host:port"。默认为 None。
+        cookies (Optional[str]): Chrome cookie 文件路径。如果提供，将禁用代理。
 
     返回:
         tuple: (bool, str | dict)
@@ -28,8 +29,10 @@ def dl_audio(url: str, store_path: str, proxy: Optional[str] = None):
                 'preferredcodec': 'm4a',
             }],
         }
-        if proxy:
+        if proxy and not cookies:
             ydl_opts['proxy'] = proxy
+        if cookies:
+            ydl_opts['cookiefile'] = cookies
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             # 先提取元数据

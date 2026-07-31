@@ -6,7 +6,7 @@ version: 0.2.0
 
 # yt-whisper — YouTube Audio Transcription
 
-Downloads audio from YouTube videos (via pytubefix), splits into chunks, and transcribes via Deepgram's Nova-2 Whisper model. Designed as the **fallback** when no subtitles are available on a video.
+Downloads audio from YouTube videos (via yt-dlp), splits into chunks, and transcribes via Deepgram's Nova-2 Whisper model. Designed as the **fallback** when no subtitles are available on a video.
 
 ## When to Use
 
@@ -20,14 +20,17 @@ When an AI agent needs text from a YouTube video that has **no subtitles**. This
 
 # Using Python directly:
 python3 cli.py "https://www.youtube.com/watch?v=VIDEO_ID" --lang zh
+
+# With Chrome cookies for authentication (bypasses bot detection, disables proxy):
+./dist/yt-whisper "https://www.youtube.com/watch?v=VIDEO_ID" --cookies /tmp/youtube_cookies.txt
 ```
 
-The URL is a **positional argument**. `--lang` is optional (auto-detect if omitted).
+The URL is a **positional argument**. `--lang` is optional (auto-detect if omitted). `--cookies` provides Chrome/Netscape-format cookies for YouTube auth.
 
 ## Pipeline
 
 ```
-pytubefix download audio
+yt-dlp download audio
     → ffmpeg split into 480-second chunks
     → 4-thread concurrent Deepgram transcription
     → merged transcript text
@@ -43,12 +46,23 @@ YT_DL_PROXY=http://proxy:port      # Optional: proxy for YouTube access
 
 Both `WHISPER_PROVIDER` and `WHISPER_API_KEY` must be set. Currently only **Deepgram** is fully implemented (Cloudflare and Groq are stubs).
 
+### Proxy vs Cookie Authentication
+
+Two mutually exclusive methods for YouTube authentication:
+
+| Method | Config | Behavior |
+|--------|--------|----------|
+| **Proxy** | `YT_DL_PROXY` in `.env` | Routes yt-dlp through proxy server |
+| **Cookies** | `--cookies /path/to/cookies.txt` | Uses browser cookies; **disables proxy automatically** |
+
+> When `--cookies` is provided, `YT_DL_PROXY` is ignored.
+
 ## Requirements
 
 - Python 3.11+
 - **ffmpeg** installed (`sudo apt install ffmpeg`)
 - Deepgram API key
-- Dependencies: `pytubefix`, `deepgram-sdk>=0.4.0`, `python-dotenv`
+- Dependencies: `yt-dlp`, `deepgram-sdk>=0.4.0`, `python-dotenv`
 
 ## Output Format
 
@@ -85,7 +99,7 @@ yt-whisper-exec/
 │   ├── whisper_deepgram.py        # Deepgram transcription (Nova-2)
 │   └── whisper_cf.py              # Cloudflare stub (not implemented)
 ├── youtube/
-│   └── yt_audio_dl.py             # Audio download via pytubefix
+│   └── yt_audio_dl.py             # Audio download via yt-dlp
 ├── utils/
 │   ├── constant.py                # MAX_WORKERS_NUMBER, defaults
 │   └── utils.py                   # Shared utilities
@@ -100,16 +114,20 @@ yt-whisper-exec/
 | Transcription succeeds | `status: "success"` with transcript | Proceed with content |
 | Missing API key | `status: "error"`, reason explains | Tell user to configure `.env` |
 | ffmpeg not found | Download fails | Install ffmpeg: `sudo apt install ffmpeg` |
-| pytubefix blocked | Bot detection error | Check `YT_DL_PROXY` is set |
+| YouTube blocked | Bot detection error | Use `--cookies /path/to/cookies.txt` or set `YT_DL_PROXY` |
 | Invalid language code | Warning logged, auto-detect used | Transcript still succeeds |
 | Unsupported provider | `status: "error"` | Only `deepgram` is implemented |
+| Cookies file not found | Download fails | Verify `--cookies` path exists and is valid Netscape format |
+| Cookies + proxy both set | Proxy silently disabled | Cookies take priority per design |
 
 ## Troubleshooting
 
 1. **"ffmpeg not found"** → `sudo apt install ffmpeg`
-2. **Bot detection on YouTube** → configure `YT_DL_PROXY` in `.env`
+2. **Bot detection on YouTube** → use `--cookies /path/to/cookies.txt` (recommended) or configure `YT_DL_PROXY` in `.env`
 3. **"WHISPER_PROVIDER and WHISPER_API_KEY must be set"** → create `.env` with both values
 4. **Transcription timeout** → the tool uses a heartbeat every 30s to keep long transcriptions alive; if it still times out, check network/API quota
+5. **Cookies file issues** → ensure the file is exported from Chrome in Netscape format using an extension like "Get cookies.txt LOCALLY"
+6. **Proxy ignored when using cookies** → this is by design; `--cookies` and `YT_DL_PROXY` are mutually exclusive
 
 ## Related
 

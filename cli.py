@@ -58,7 +58,7 @@ class Context:
     async def report_progress(self, current: int, total: int, msg: str):
         logging.info(f"Progress: {current}/{total} - {msg}")
 
-async def audio_transcribe_with_id(url: str, language: Optional[str] = None) -> Dict[str, Any]:
+async def audio_transcribe_with_id(url: str, language: Optional[str] = None, cookies: Optional[str] = None) -> Dict[str, Any]:
     """音频转录核心逻辑"""
     # Check environment variables first
     if not whisper_provider or not whisper_api_key:
@@ -142,7 +142,7 @@ async def audio_transcribe_with_id(url: str, language: Optional[str] = None) -> 
             await ctx.report_progress(10, 100, "Downloading audio")
             
             logging.info(f"Downloading audio from {url} to {temp_dir}")
-            success, result_or_error = dl_audio(url, temp_dir, yt_dl_proxy)
+            success, result_or_error = dl_audio(url, temp_dir, yt_dl_proxy, cookies)
 
             if not success:
                 error_msg = f"Failed to download audio: {result_or_error}"
@@ -243,11 +243,12 @@ def main():
     # Main arguments (transcribe is the only function)
     parser.add_argument('url', help='YouTube video URL')
     parser.add_argument('--lang', help='Language code for transcription (optional, auto-detect if not specified)')
+    parser.add_argument('--cookies', help='Path to Chrome cookies file for YouTube authentication (disables proxy when used)')
     
     args = parser.parse_args()
     
     # Execute transcription
-    result = asyncio.run(audio_transcribe_with_id(args.url, args.lang))
+    result = asyncio.run(audio_transcribe_with_id(args.url, args.lang, args.cookies))
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
