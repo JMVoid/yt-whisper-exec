@@ -47,13 +47,14 @@ After compilation, the executable will be located at:
 ### Command-line Usage
 
 ```bash
-yt-whisper <URL> [--lang LANG] [--cookies PATH]
+yt-whisper <URL> [--lang LANG] [--cookies PATH] [-o OUTPUT]
 ```
 
 **Arguments:**
 - `URL` (required): The full URL of the YouTube video
 - `--lang` (optional): Language code for transcription. If not specified, auto-detection is used.
 - `--cookies` (optional): Path to a Chrome/Netscape-format cookies file for YouTube authentication. When this option is used, proxy is automatically disabled.
+- `-o`, `--output` (optional): Output file path for transcription result. If not specified, output is printed to stdout.
 
 **Examples:**
 ```bash
@@ -62,6 +63,9 @@ yt-whisper <URL> [--lang LANG] [--cookies PATH]
 
 # Use Chrome cookies file for authentication (bypass bot detection without proxy)
 ./yt-whisper "https://www.youtube.com/watch?v=xxxxx" --cookies /tmp/youtube_cookies.txt
+
+# Save output to a file
+./yt-whisper "https://www.youtube.com/watch?v=xxxxx" --lang zh -o transcript.json
 ```
 
 ### Environment Configuration

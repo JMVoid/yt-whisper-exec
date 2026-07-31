@@ -8,7 +8,8 @@ from typing import Optional, Dict, Any
 
 from youtube.yt_audio_dl import dl_audio
 from whisper.whisper_deepgram import transcribe_with_deepgram
-from utils.constant import MAX_WORKERS_NUMBER
+from utils.constant import MAX_WORKERS_NUMBERexit
+
 from dotenv import load_dotenv
 
 # 配置日志
@@ -244,12 +245,19 @@ def main():
     parser.add_argument('url', help='YouTube video URL')
     parser.add_argument('--lang', help='Language code for transcription (optional, auto-detect if not specified)')
     parser.add_argument('--cookies', help='Path to Chrome cookies file for YouTube authentication (disables proxy when used)')
+    parser.add_argument('-o', '--output', help='Output file path for transcription result (outputs to stdout if not specified)')
     
     args = parser.parse_args()
     
     # Execute transcription
     result = asyncio.run(audio_transcribe_with_id(args.url, args.lang, args.cookies))
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    output_json = json.dumps(result, indent=2, ensure_ascii=False)
+    if args.output:
+        with open(args.output, 'w', encoding='utf-8') as f:
+            f.write(output_json)
+        logging.info(f"Result written to {args.output}")
+    else:
+        print(output_json)
 
 if __name__ == "__main__":
     main()

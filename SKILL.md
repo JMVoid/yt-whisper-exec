@@ -23,9 +23,12 @@ python3 cli.py "https://www.youtube.com/watch?v=VIDEO_ID" --lang zh
 
 # With Chrome cookies for authentication (bypasses bot detection, disables proxy):
 ./dist/yt-whisper "https://www.youtube.com/watch?v=VIDEO_ID" --cookies /tmp/youtube_cookies.txt
+
+# Save output to a file instead of stdout:
+./dist/yt-whisper "https://www.youtube.com/watch?v=VIDEO_ID" --lang zh -o transcript.json
 ```
 
-The URL is a **positional argument**. `--lang` is optional (auto-detect if omitted). `--cookies` provides Chrome/Netscape-format cookies for YouTube auth.
+The URL is a **positional argument**. `--lang` is optional (auto-detect if omitted). `--cookies` provides Chrome/Netscape-format cookies for YouTube auth. `-o`/`--output` writes the result to a file instead of stdout.
 
 ## Pipeline
 
