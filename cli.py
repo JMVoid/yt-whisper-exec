@@ -8,7 +8,7 @@ from typing import Optional, Dict, Any
 
 from youtube.yt_audio_dl import dl_audio
 from whisper.whisper_deepgram import transcribe_with_deepgram
-from utils.constant import MAX_WORKERS_NUMBERexit
+from utils.constant import MAX_WORKERS_NUMBER
 
 from dotenv import load_dotenv
 
