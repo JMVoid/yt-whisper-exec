@@ -47,7 +47,7 @@ def transcribe_segment(
 
             # 3. 配置转录选项
             options = {
-                "model": "nova-2",
+                "model": "nova-3",
                 "smart_format": True,
                 "punctuate": True,
                 "utterances": True,
